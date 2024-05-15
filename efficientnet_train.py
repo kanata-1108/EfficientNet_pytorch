@@ -7,18 +7,16 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
 
-os.chdir("/src/EfficientNet")
+os.chdir("/usr/src/EfficientNet_pytorch")
 
 # データの前処理
 trans = transforms.Compose([transforms.ToTensor(), transforms.Resize(224, antialias = True), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 # 訓練用データ
 train_dataset = datasets.CIFAR10(root = ".", train = True, download = True, transform = trans)
+train_dataset.targets = train_dataset.targets[:1000]
+train_dataset.data = train_dataset.data[:1000]
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size = 32, shuffle = True)
-
-# テスト用データ
-test_dataset = datasets.CIFAR10(root = ".", train = False, download = True, transform = trans)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size = 32, shuffle = True)
 
 # EfficientNetの読み込み
 efficient_net = models.efficientnet_b0()
@@ -74,7 +72,7 @@ def train_model(model, epochs, loader):
 
     return losses, accuracy, model
 
-Epoch = 20
+Epoch = 1
 loss_list, acc_list, update_model = train_model(model = efficient_net, epochs = Epoch, loader = train_loader)
 torch.save(update_model.state_dict(), "./update_efficientnet.pth")
 
